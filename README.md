@@ -7,3 +7,10 @@ Add a profanity filter.
 
 # How to run: 
 python3 -m run main.py 
+
+# What's helpful: 
+ChatGPT Plus is helpful for getting started but can yield random code  
+Official docs is helpful for debugging 
+Profanity filter - get profanity.txt  from https://github.com/JamesTheHacker/profanity-bash/blob/master/banned_words.txt 
+
+
