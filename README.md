@@ -1,2 +1,2 @@
-# chatbot
-Build a chatbot with chatgpt api 
+# Assignment: 
+Commandline chatbot, take to web with streamlit, make it interesting
