@@ -10,7 +10,7 @@ python3 -m run main.py
 
 # What's helpful: 
 ChatGPT Plus is helpful for getting started but can yield random code  
-Official docs is helpful for debugging 
+Official docs for OpenAI API, Streamlit, and Streamlit community is helpful for debugging 
 Profanity filter - get profanity.txt  from https://github.com/JamesTheHacker/profanity-bash/blob/master/banned_words.txt 
 
 
