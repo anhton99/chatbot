@@ -6,7 +6,7 @@ A chatbot using OpenAI API. Use streamlit and streamlit-chat for UI.
 Add a profanity filter. 
 
 # How to run: 
-python3 -m run main.py 
+python3 -m streamlit run main.py 
 
 # What's helpful: 
 ChatGPT Plus is helpful for getting started but can yield random code  
