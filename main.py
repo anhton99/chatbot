@@ -2,60 +2,61 @@ import openai
 import os
 from dotenv import load_dotenv
 import streamlit as st
-from streamlit_chat import message
 
 load_dotenv('.env')
 openai.api_key = os.getenv('OPENAI_API_KEY')
 
-# Source: https://github.com/JamesTheHacker/profanity-bash/blob/master/banned_words.txt 
-banned = {}
-with open("profanity.txt") as f:
-    for line in f:
-        banned[line] = ''
+SYSTEM_PROMPT = "You are a helpful assistant."
+
+messages = [{"role": "system", "content": SYSTEM_PROMPT}]
 
 def chat():
+    def moderation(user_input):
+        return openai.Moderation.create(input=user_input).results[0].flagged
+    
+    def reply(user_input, history):
 
-    def profanity_check(user_input):
-        lst = user_input.split(" ")
-        for word in lst: 
-            if word in banned: 
-                return False 
-        return True 
+        if history:
+            for i in reversed(range(len(history))):
+                messages.append({"role": "user", "content": history[i][0]}) 
+                messages.append({"role": "assistant", "content": history[i][1]}) 
 
-    def reply(user_input):
-        if profanity_check(user_input):
-            raise Exception("Profanity detected. Please be kind :)")
-        try: 
-            res = openai.ChatCompletion.create(
-                model = "gpt-3.5-turbo-0301",
-                messages = [{"role": "user", "content": user_input}]
-            ).choices[0].message.content.strip()
-            return res
-        except Exception as e:
-            return "Error: " + str(e)
+        messages.append({"role": "user", "content": user_input})
 
-    if 'answers' not in st.session_state:
-        st.session_state['answers'] = []
+        res = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",
+            messages = messages,
+        ).choices[0].message.content
+
+        messages.append({"role": "assistant", "content": res})
+
+        return res
+    
     if 'questions' not in st.session_state:
         st.session_state['questions'] = []
-    if 'user_input' not in st.session_state:
-        st.session_state['user_input'] = ''
+    
+    if 'answers' not in st.session_state:
+        st.session_state['answers'] = []
 
-    user_input = st.text_input("Enter your question here", key = 'input1')
-    if user_input:
-        res = reply(user_input)
-        st.session_state.questions.append(user_input)
-        st.session_state.answers.append(res)  
-
+    history = []
+    i = 0 
+    while i < len(st.session_state['questions']):
+        history.append((st.session_state['questions'][i], 
+                        st.session_state['answers'][i]))
+        i += 1 
+        
+    user_input = st.text_area("Enter your question here: ")
+    if moderation(user_input):
+        raise Exception("Moderation check: usage policy violated.")
+    res = reply(user_input, history)
+    st.session_state.questions.append(user_input)
+    st.session_state.answers.append(res)  
 
     if st.session_state['answers']:
-        for i in range(len(st.session_state.answers)):
-            message(st.session_state.questions[i], is_user=True, key=str(i) + '_user')
-            message(st.session_state.answers[i], key=str(i))  
-
+        for i in range(1, len(st.session_state['answers'])):
+            st.markdown('You: ' + st.session_state['questions'][i])
+            st.markdown('ChatGPT: ' + st.session_state['answers'][i])  
 
 if __name__ == '__main__':
-    st.title("Chatbot with Streamlit")
-    st.markdown("Welcome to the Chatbot. Ask me anything and Hit 'Enter' to submit.") 
-
+    st.markdown('### Hi this is cool')
     chat() 
